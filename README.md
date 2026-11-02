@@ -24,11 +24,12 @@ npm run preview  # 빌드 결과 미리보기 (/osakatrip/)
 
 예상 URL: **https://seo-roy.github.io/osakatrip/**
 
-1. 이 PR을 `main`에 **merge**
-2. 저장소 **Settings → Pages**
-   - Source: **GitHub Actions**
-3. merge 후(또는 Actions 탭에서 **Deploy GitHub Pages** workflow_dispatch) 워크플로가 `dist`를 배포합니다.
-4. 첫 배포 후 위 URL로 열람. 비밀값·토큰을 새로 만들 필요 없음(기본 `GITHUB_TOKEN`).
+1. 저장소 **Settings → Pages** → Build and deployment → Source: **GitHub Actions**  
+   (배포 워크플로보다 **먼저** 켜 두는 것이 안전합니다. 안 켜면 deploy 단계가 HTTP 404로 실패합니다.)
+2. 배포 수정 PR을 `main`에 **merge** (또는 Actions → **Deploy GitHub Pages** → **Run workflow**)
+3. 워크플로가 초록이면 위 URL로 열람. 커스텀 시크릿 불필요(기본 `GITHUB_TOKEN`).
+
+빌드(`npm ci` / `npm run build`)는 통과하고 deploy만 404인 경우 → Pages Source가 Actions인지 확인 후 워크플로를 다시 실행하세요.
 
 SPA 하위 경로 새로고침은 `dist/404.html`(index 복사)로 처리합니다.
 

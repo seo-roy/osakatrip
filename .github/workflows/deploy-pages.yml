@@ -1,5 +1,9 @@
 # Deploy Vite SPA to GitHub Pages (project site: /osakatrip/)
 # No custom secrets — uses the default GITHUB_TOKEN + Pages OIDC.
+#
+# Repo setup (once): Settings → Pages → Build and deployment → Source: GitHub Actions
+# If deploy fails with HTTP 404 "Ensure GitHub Pages has been enabled", turn on
+# Pages (Actions) then re-run this workflow (Actions → Deploy GitHub Pages → Run workflow).
 name: Deploy GitHub Pages
 
 on:
@@ -28,6 +32,9 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Install
         run: npm ci
