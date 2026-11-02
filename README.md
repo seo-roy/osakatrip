@@ -12,12 +12,25 @@ npm install
 npm run dev
 ```
 
-브라우저에서 Vite가 안내하는 주소(기본 `http://localhost:5173`)를 엽니다.
+브라우저에서 Vite가 안내하는 주소(기본 `http://localhost:5173/osakatrip/`)를 엽니다.  
+(`vite` `base`는 **project Pages**용 `/osakatrip/` — user/org root Pages를 쓸 때는 `base: '/'`로 바꾸면 됩니다.)
 
 ```bash
-npm run build    # 타입체크 + 프로덕션 빌드
-npm run preview  # 빌드 결과 미리보기
+npm run build    # 타입체크 + 프로덕션 빌드 (+ SPA용 dist/404.html)
+npm run preview  # 빌드 결과 미리보기 (/osakatrip/)
 ```
+
+## GitHub Pages 배포 (무료)
+
+예상 URL: **https://seo-roy.github.io/osakatrip/**
+
+1. 이 PR을 `main`에 **merge**
+2. 저장소 **Settings → Pages**
+   - Source: **GitHub Actions**
+3. merge 후(또는 Actions 탭에서 **Deploy GitHub Pages** workflow_dispatch) 워크플로가 `dist`를 배포합니다.
+4. 첫 배포 후 위 URL로 열람. 비밀값·토큰을 새로 만들 필요 없음(기본 `GITHUB_TOKEN`).
+
+SPA 하위 경로 새로고침은 `dist/404.html`(index 복사)로 처리합니다.
 
 ## 화면
 
@@ -56,7 +69,7 @@ npm run preview  # 빌드 결과 미리보기
 - 추천 맛집: 날짜별 일정에 구체 식당명 (「추천」)
 - 12/5: **교토** 당일치기 (수족관 아님)
 - 교통 요금: 대략/참고만 (확정 아님)
-- 공유: 단순 배포 URL OK · 가끔 파일 맞추기(설정) · 일정 편집 성인 1명
+- 공유(v1): **GitHub Pages** 공개 URL `https://seo-roy.github.io/osakatrip/` · 가끔 파일 맞추기(설정) · 일정 편집 성인 1명
 - PIN·로그인은 later
 
 ## 하지 않음
