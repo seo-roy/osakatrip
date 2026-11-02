@@ -106,6 +106,7 @@ function applyContentRevision(doc: TripDocument): TripDocument {
     days: structuredClone(seed.days),
     usj: {
       ...seed.usj,
+      visitDate: tripMeta.usjVisitDate,
       checklist: seed.usj.checklist.map((s) => {
         const prev = doc.usj.checklist.find((c) => c.id === s.id)
         return prev ? { ...s, done: prev.done } : s

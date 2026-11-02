@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { formatShortDate, tripMeta } from '../data/sampleTrip'
 import {
   flights,
+  formatTerminalLine,
   lodging,
   partyDisplayLine,
 } from '../data/travelBookings'
@@ -58,6 +59,14 @@ export function HomePage() {
                 {leg.date.replaceAll('-', '.')} ({leg.weekday}) · {leg.fromCode}{' '}
                 {leg.departLocal} → {leg.toCode} {leg.arriveLocal}
               </p>
+              {formatTerminalLine(leg) ? (
+                <p className="flight-card__terminal">
+                  {formatTerminalLine(leg)}
+                  {leg.terminalNote ? (
+                    <span className="muted"> · {leg.terminalNote}</span>
+                  ) : null}
+                </p>
+              ) : null}
               <p className="muted">
                 {leg.fromName} → {leg.toName}
               </p>
@@ -77,14 +86,14 @@ export function HomePage() {
           {days.map((day) => (
             <li key={day.date}>
               <Link to={`/itinerary/${day.date}`} className="day-row">
-                <span className="day-row__day">Day {day.dayIndex}</span>
+                <span className="day-row__day">
+                  {formatShortDate(day.date)}
+                </span>
                 <span className="day-row__meta">
-                  <strong>
-                    {formatShortDate(day.date)} · {day.dayLabel}
-                  </strong>
+                  <strong>{day.dayLabel}</strong>
                   <span>
                     {day.items.length}곳
-                    {day.dayIndex === tripMeta.usjDayIndex ? ' · USJ' : ''}
+                    {day.date === tripMeta.usjVisitDate ? ' · USJ' : ''}
                   </span>
                 </span>
                 <span className="day-row__chev" aria-hidden="true">
@@ -100,8 +109,12 @@ export function HomePage() {
         <Link to="/usj" className="action-tile action-tile--usj">
           <span className="action-tile__label">USJ</span>
           <span className="action-tile__sub">
-            Day {tripMeta.usjDayIndex} · {tripMeta.usjVisitDate}
+            {tripMeta.usjVisitDate.replaceAll('-', '.')}
           </span>
+        </Link>
+        <Link to="/transit" className="action-tile">
+          <span className="action-tile__label">교통</span>
+          <span className="action-tile__sub">요금은 대략·참고</span>
         </Link>
         <Link to="/packing" className="action-tile">
           <span className="action-tile__label">준비물</span>

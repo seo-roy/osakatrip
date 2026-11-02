@@ -1,10 +1,10 @@
 /**
- * 예시 데이터 — 실제 예약·시간·요금과 다를 수 있음.
- * 확정 여행 사실이 아니며, UI 골격 확인용 샘플입니다.
+ * 가족 여행 시드 — 숙소·항공은 확정 요약, 일차·식당은 「추천」동선.
+ * 요금·터미널은 참고(변동 가능). 확인코드 없음.
  */
 
 export const SAMPLE_DISCLAIMER =
-  '샘플 — 실제 예약/시간과 다를 수 있음'
+  '추천 일정 · 시각·요금은 달라질 수 있어요'
 
 export type PlaceCategory = '식사' | '관광' | '숙소' | '이동거점' | '기타'
 
@@ -28,6 +28,8 @@ export interface Transit {
   toLabel: string
   modeNote: string
   stepsMemo: string
+  /** 대략 요금 참고 — 확정 요금 아님 */
+  fareApprox?: string
   checkUrl?: string
   dateRefs?: string[]
   placeRefs?: string[]
@@ -69,13 +71,12 @@ export const tripMeta = {
   startDate: '2026-12-03',
   endDate: '2026-12-07',
   partySize: 4,
-  /** 표시용 가족 이름 — 초등 학년 문구 대신 사용 */
   partyNote: '아빠 · 엄마 · Alice · Roy',
   homeMemo: '',
-  usjVisitDate: '2026-12-06',
-  usjDayIndex: 4,
+  /** 달력 날짜 — “여행 n일차”가 아님 */
+  usjVisitDate: '2026-12-04',
   updatedAt: '2026-11-02T00:00:00+00:00',
-  contentRevision: 3,
+  contentRevision: 4,
   isSample: true as const,
 }
 
@@ -90,31 +91,65 @@ export const places: Place[] = [
     address: '오사카시 나니와구 (Naniwa Ward, Osaka)',
     mapUrl: 'https://maps.google.com/?q=Naniwa+Ward+Osaka',
     verifyMemo:
-      '가족 메모: 24시간 동안 무료 취소 가능. 이후 취소 시 환불 불가. 시간은 리스팅 현지 시간 기준.',
-    kidsNote: '아이용 여분 충전기 챙기기',
-    linkedTransitIds: ['transit-hotel-station'],
+      '가족 메모: 24시간 동안 무료 취소 가능. 이후 취소 시 환불 불가.',
+    kidsNote: '충전기·간식 챙기기',
+    linkedTransitIds: ['transit-kix-hotel', 'transit-hotel-station'],
+  },
+  {
+    placeId: 'place-kix',
+    name: '간사이 국제공항 (KIX)',
+    nameLocal: '関西国際空港',
+    category: '이동거점',
+    familyBlurb: '출도착 공항이에요. 터미널은 비행기 칸을 꼭 확인해요.',
+    address: 'Kansai International Airport (KIX)',
+    mapUrl: 'https://maps.google.com/?q=Kansai+International+Airport',
+    officialUrl: 'https://www.kansai-airport.or.jp/ko',
+    linkedTransitIds: ['transit-kix-hotel'],
   },
   {
     placeId: 'place-dotonbori',
     name: '도톤보리',
     nameLocal: '道頓堀',
     category: '관광',
-    familyBlurb: '저녁에 걷기 좋은 거리예요. 사람 많으면 손 잡고 다녀요.',
+    familyBlurb: '네온과 다리가 있는 거리예요. Alice·Roy와 걷기 좋아요.',
     address: '오사카시 주오구 도톤보리',
     mapUrl: 'https://maps.google.com/?q=Dotonbori+Osaka',
-    officialUrl: 'https://www.osaka-info.jp/',
-    kidsNote: '헤어지면 만날 곳을 미리 정해요.',
+    kidsNote: '사람 많으면 손 잡아요.',
     linkedTransitIds: ['transit-hotel-dotonbori'],
   },
   {
-    placeId: 'place-osaka-castle',
-    name: '오사카성 공원',
-    nameLocal: '大阪城公園',
+    placeId: 'place-dinner-doton',
+    name: '도톤보리 저녁 (추천)',
+    nameLocal: '道頓堀',
+    category: '식사',
+    familyBlurb:
+      '추천: 타코야키·쿠시카츠 등 아이 친화 포차/가게. 줄이 길면 옆 골목도 봐요.',
+    address: '도톤보리 일대',
+    mapUrl: 'https://maps.google.com/?q=Dotonbori+food',
+    kidsNote: '맵지 않은 메뉴를 골라요.',
+    linkedTransitIds: ['transit-hotel-dotonbori'],
+  },
+  {
+    placeId: 'place-usj',
+    name: '유니버설 스튜디오 재팬',
+    nameLocal: 'ユニバーサル・スタジオ・ジャパン',
     category: '관광',
-    familyBlurb: '성 주변을 걸으며 사진 찍기 좋아요.',
-    mapUrl: 'https://maps.google.com/?q=Osaka+Castle',
-    officialUrl: 'https://www.osakacastle.net/',
-    linkedTransitIds: ['transit-hotel-castle'],
+    familyBlurb:
+      '12월 4일(금)에 가요. 티켓·안내는 USJ 메뉴와 한국어 공식 사이트를 봐요.',
+    mapUrl: 'https://maps.google.com/?q=Universal+Studios+Japan',
+    officialUrl: 'https://www.usj.co.jp/web/ko/usj',
+    kidsNote: '만날 곳을 미리 정해요.',
+    linkedTransitIds: ['transit-hotel-usj'],
+  },
+  {
+    placeId: 'place-usj-lunch',
+    name: 'USJ·시티워크 식사 (추천)',
+    category: '식사',
+    familyBlurb:
+      '추천: 파크 안 또는 유니버설·시티워크 식당. 공식 앱·현장에서 메뉴를 확인해요.',
+    mapUrl: 'https://maps.google.com/?q=Universal+CityWalk+Osaka',
+    kidsNote: '줄이 길면 간식으로 나눠 먹어요.',
+    linkedTransitIds: ['transit-hotel-usj'],
   },
   {
     placeId: 'place-aquarium',
@@ -128,48 +163,76 @@ export const places: Place[] = [
     linkedTransitIds: ['transit-hotel-aquarium'],
   },
   {
-    placeId: 'place-usj',
-    name: '유니버설 스튜디오 재팬',
-    nameLocal: 'ユニバーサル・スタジオ・ジャパン',
+    placeId: 'place-tempozan-food',
+    name: '템포잔 마켓플레이스 식사 (추천)',
+    category: '식사',
+    familyBlurb:
+      '추천: 카이유칸 옆 템포잔에서 가볍게 점심/간식. 아이 메뉴가 많은 편이에요.',
+    mapUrl: 'https://maps.google.com/?q=Tempozan+Marketplace+Osaka',
+    linkedTransitIds: ['transit-hotel-aquarium'],
+  },
+  {
+    placeId: 'place-osaka-castle',
+    name: '오사카성 공원',
+    nameLocal: '大阪城公園',
     category: '관광',
-    familyBlurb: 'Day 4에 가요. 자세한 안내는 USJ 메뉴와 공식 사이트를 봐요.',
-    mapUrl: 'https://maps.google.com/?q=Universal+Studios+Japan',
-    officialUrl: 'https://www.usj.co.jp/web/ko/usj',
-    kidsNote: '만날 곳과 키 제한은 USJ 화면 메모를 봐요.',
-    linkedTransitIds: ['transit-hotel-usj'],
+    familyBlurb: '성 주변을 걸으며 사진 찍기 좋아요.',
+    mapUrl: 'https://maps.google.com/?q=Osaka+Castle',
+    officialUrl: 'https://www.osakacastle.net/',
+    linkedTransitIds: ['transit-hotel-castle'],
+  },
+  {
+    placeId: 'place-lunch-castle',
+    name: '성 근처 점심 (추천)',
+    category: '식사',
+    familyBlurb:
+      '추천: 공원 근처 식당 또는 오사카성 공원 카페. 붐비면 조기 점심을 권해요.',
+    mapUrl: 'https://maps.google.com/?q=Osaka+Castle+restaurant',
+    linkedTransitIds: ['transit-hotel-castle'],
+  },
+  {
+    placeId: 'place-shinsaibashi',
+    name: '신사이바시·쇼핑',
+    nameLocal: '心斎橋',
+    category: '관광',
+    familyBlurb: '걷기·기념품 사기 좋아요. 피곤하면 짧게만 다녀와요.',
+    mapUrl: 'https://maps.google.com/?q=Shinsaibashi+Osaka',
+    kidsNote: '길을 잃지 않게 약속을 정해요.',
+    linkedTransitIds: ['transit-hotel-shinsaibashi'],
+  },
+  {
+    placeId: 'place-dinner-namba',
+    name: '난바 저녁 (추천)',
+    category: '식사',
+    familyBlurb:
+      '추천: 난바·도톤보리 쪽 라멘·오코노미야키 등. Alice·Roy가 먹을 수 있는 순한 맛을 고르세요.',
+    mapUrl: 'https://maps.google.com/?q=Namba+Osaka+dinner',
+    linkedTransitIds: ['transit-hotel-dotonbori'],
   },
   {
     placeId: 'place-kuromon',
     name: '구로몬 시장',
     nameLocal: '黒門市場',
     category: '식사',
-    familyBlurb: '아침·간식 먹기 좋은 시장이에요.',
+    familyBlurb: '아침·간식 먹기 좋은 시장이에요. 귀국 날 짧게 들르기 좋아요.',
     mapUrl: 'https://maps.google.com/?q=Kuromon+Market',
     linkedTransitIds: ['transit-hotel-kuromon'],
   },
-  {
-    placeId: 'place-kix',
-    name: '간사이 국제공항 (KIX)',
-    nameLocal: '関西国際空港',
-    category: '이동거점',
-    familyBlurb:
-      '출도착 공항. 탑승·수하물·교통은 공항·항공사 공식 안내로 확인하세요.',
-    address: 'Kansai International Airport (KIX)',
-    mapUrl: 'https://maps.google.com/?q=Kansai+International+Airport',
-    officialUrl: 'https://www.kansai-airport.or.jp/ko',
-    linkedTransitIds: ['transit-kix-hotel'],
-  },
 ]
 
+/** 요금은 대략·참고. 당일 IC·창구 요금이 다를 수 있음. */
 export const transits: Transit[] = [
   {
     transitId: 'transit-kix-hotel',
     fromLabel: 'KIX',
-    toLabel: '숙소 · 나니와구',
-    modeNote: '공항 교통+도보 (메모)',
+    toLabel: '숙소 · 나니와구 (난바 방면)',
+    modeNote: '난카이 공항급행 추천',
     stepsMemo:
-      '배차·요금은 앱에 고정하지 않습니다. 지도·공항 교통 안내로 재확인.',
-    checkUrl: 'https://maps.google.com/maps/dir/?api=1&origin=Kansai+International+Airport&destination=Naniwa+Ward+Osaka',
+      '간사이공항역 → 난바역(난카이). 짐 있으면 엘리베이터를 찾아요. 지도 앱으로 숙소까지 이어서 가요.',
+    fareApprox:
+      '대략 어른 약 970엔 / 아이 약 490엔 (공항급행·참고). 라피트는 더 비쌈. 변동 가능.',
+    checkUrl:
+      'https://www.google.com/maps/dir/?api=1&origin=Kansai+International+Airport&destination=Namba+Osaka',
     dateRefs: ['2026-12-03', '2026-12-07'],
     placeRefs: ['place-kix', 'place-hotel'],
     cautionMemo: '캐리어·아이와 이동 시 여유 있게',
@@ -179,58 +242,76 @@ export const transits: Transit[] = [
     fromLabel: '숙소 · 나니와구',
     toLabel: '가까운 역',
     modeNote: '도보',
-    stepsMemo: '짐이 있으면 엘리베이터를 찾아요.',
+    stepsMemo: '숙소에서 가까운 역까지 걸어요. 정확한 출구는 지도로 확인.',
+    fareApprox: '도보 · 요금 없음',
     dateRefs: ['2026-12-03'],
     placeRefs: ['place-hotel'],
-    cautionMemo: '캐리어 있을 때 조심해요',
   },
   {
     transitId: 'transit-hotel-dotonbori',
     fromLabel: '숙소 · 나니와구',
-    toLabel: '도톤보리',
-    modeNote: '지하철+도보',
-    stepsMemo: '출발 전에 지도 앱으로 길을 한 번 더 봐요.',
+    toLabel: '도톤보리·난바',
+    modeNote: '도보 또는 짧은 지하철',
+    stepsMemo: '가까우면 걸어가요. 피곤하면 지하철 1~2정거장.',
+    fareApprox: '대략 어른 180~280엔 (지하철·참고) · 도보면 0엔',
     checkUrl: 'https://maps.google.com/?q=Dotonbori+Osaka',
-    dateRefs: ['2026-12-03'],
-    placeRefs: ['place-dotonbori'],
+    dateRefs: ['2026-12-03', '2026-12-06'],
+    placeRefs: ['place-dotonbori', 'place-dinner-doton', 'place-dinner-namba'],
+  },
+  {
+    transitId: 'transit-hotel-usj',
+    fromLabel: '숙소 · 나니와구 (난바)',
+    toLabel: 'USJ',
+    modeNote: '전철 환승 (추천)',
+    stepsMemo:
+      '난바 방면 → 서쿠조(西九条) 환승 → JR 유메사키선 → 유니버설시티. IC카드가 편해요.',
+    fareApprox: '대략 어른 약 380~400엔 편도 (참고) · 아이 약 반값대. 변동 가능.',
+    checkUrl:
+      'https://www.google.com/maps/dir/?api=1&origin=Namba+Osaka&destination=Universal+Studios+Japan',
+    dateRefs: ['2026-12-04'],
+    placeRefs: ['place-usj', 'place-usj-lunch'],
+    cautionMemo: '손 잡고, 만날 곳을 미리 정해요',
+  },
+  {
+    transitId: 'transit-hotel-aquarium',
+    fromLabel: '숙소 · 나니와구',
+    toLabel: '카이유칸·템포잔',
+    modeNote: '지하철+도보',
+    stepsMemo: '지하철로 오사카항(Osakako) 방면 후 도보. 지도 앱으로 확인.',
+    fareApprox: '대략 어른 약 280~400엔 편도 (참고). 변동 가능.',
+    checkUrl: 'https://maps.google.com/?q=Kaiyukan+Osaka',
+    dateRefs: ['2026-12-05'],
+    placeRefs: ['place-aquarium', 'place-tempozan-food'],
   },
   {
     transitId: 'transit-hotel-castle',
     fromLabel: '숙소 · 나니와구',
     toLabel: '오사카성 공원',
     modeNote: '지하철+도보',
-    stepsMemo: '출발 전에 지도 앱으로 길을 한 번 더 봐요.',
+    stepsMemo: '지하철로 모리노미야·오사카비즈니스파크 등 하차 후 공원 산책.',
+    fareApprox: '대략 어른 약 230~280엔 편도 (참고). 변동 가능.',
     checkUrl: 'https://maps.google.com/?q=Osaka+Castle',
-    dateRefs: ['2026-12-04'],
-    placeRefs: ['place-osaka-castle'],
-  },
-  {
-    transitId: 'transit-hotel-aquarium',
-    fromLabel: '숙소 · 나니와구',
-    toLabel: '카이유칸',
-    modeNote: '지하철+도보',
-    stepsMemo: '출발 전에 지도 앱으로 길을 한 번 더 봐요.',
-    checkUrl: 'https://maps.google.com/?q=Kaiyukan+Osaka',
-    dateRefs: ['2026-12-05'],
-    placeRefs: ['place-aquarium'],
-  },
-  {
-    transitId: 'transit-hotel-usj',
-    fromLabel: '숙소 · 나니와구',
-    toLabel: 'USJ',
-    modeNote: '전철+도보',
-    stepsMemo: '출발 전에 지도·공식 안내를 봐요.',
-    checkUrl: 'https://maps.google.com/?q=Universal+Studios+Japan',
     dateRefs: ['2026-12-06'],
-    placeRefs: ['place-usj'],
-    cautionMemo: '손 잡고, 만날 곳을 미리 정해요',
+    placeRefs: ['place-osaka-castle', 'place-lunch-castle'],
+  },
+  {
+    transitId: 'transit-hotel-shinsaibashi',
+    fromLabel: '숙소 · 나니와구',
+    toLabel: '신사이바시',
+    modeNote: '도보 또는 지하철',
+    stepsMemo: '난바·신사이바시는 가깝습니다. 걷기 힘들면 한 정거장.',
+    fareApprox: '대략 어른 180~230엔 또는 도보',
+    checkUrl: 'https://maps.google.com/?q=Shinsaibashi+Osaka',
+    dateRefs: ['2026-12-06'],
+    placeRefs: ['place-shinsaibashi'],
   },
   {
     transitId: 'transit-hotel-kuromon',
     fromLabel: '숙소 · 나니와구',
     toLabel: '구로몬 시장',
     modeNote: '지하철+도보',
-    stepsMemo: '아침 방문 때 쓰기 좋아요.',
+    stepsMemo: '아침 짧게 들르기 좋아요.',
+    fareApprox: '대략 어른 약 180~230엔 (참고)',
     checkUrl: 'https://maps.google.com/?q=Kuromon+Market',
     dateRefs: ['2026-12-07'],
     placeRefs: ['place-kuromon'],
@@ -241,57 +322,66 @@ export const days: DayPlan[] = [
   {
     date: '2026-12-03',
     dayIndex: 1,
-    dayLabel: '도착 · 숙소',
-    dayMemo: '제주항공 7C 1305 · ICN 16:55 → KIX 18:40',
+    dayLabel: '도착 · 저녁',
+    dayMemo: '비행기 도착 후 숙소 → 도톤보리 저녁 (추천)',
     items: [
       {
         id: 'd1-0',
         placeId: 'place-kix',
         sortOrder: 1,
         timeNote: '18:40 도착',
-        itemMemo: '공항 도착 후 숙소로',
+        itemMemo: 'KIX T2 참고 · 난카이로 난바 방면',
       },
       {
         id: 'd1-1',
         placeId: 'place-hotel',
         sortOrder: 2,
         timeNote: '저녁 체크인',
-        itemMemo: '나니와구 숙소 · 짐 풀기',
+        itemMemo: '짐 풀기 · 쉬기',
       },
       {
         id: 'd1-2',
         placeId: 'place-dotonbori',
         sortOrder: 3,
         timeNote: '저녁',
-        itemMemo: '가벼운 저녁·야경',
+        itemMemo: '야경 산책',
+      },
+      {
+        id: 'd1-3',
+        placeId: 'place-dinner-doton',
+        sortOrder: 4,
+        timeNote: '저녁 식사',
+        itemMemo: '타코야키·쿠시카츠 등 (추천)',
       },
     ],
   },
   {
     date: '2026-12-04',
     dayIndex: 2,
-    dayLabel: '성·시내',
-    dayMemo: '오사카성 공원과 시내를 둘러봐요.',
+    dayLabel: 'USJ',
+    dayMemo: '12월 4일 · 유니버설 스튜디오 재팬 (추천 집중일)',
     items: [
       {
         id: 'd2-1',
-        placeId: 'place-osaka-castle',
+        placeId: 'place-usj',
         sortOrder: 1,
-        timeNote: '오전',
+        timeNote: '종일',
+        itemMemo: '공식 안내·티켓 확인',
       },
       {
         id: 'd2-2',
-        placeId: 'place-dotonbori',
+        placeId: 'place-usj-lunch',
         sortOrder: 2,
-        timeNote: '저녁',
-        itemMemo: '저녁 식사',
+        timeNote: '점심·간식',
+        itemMemo: '파크·시티워크 (추천)',
       },
     ],
   },
   {
     date: '2026-12-05',
     dayIndex: 3,
-    dayLabel: '수족관·휴식',
+    dayLabel: '수족관',
+    dayMemo: '카이유칸 · 템포잔에서 쉬며 놀아요 (추천)',
     items: [
       {
         id: 'd3-1',
@@ -300,20 +390,48 @@ export const days: DayPlan[] = [
         timeNote: '오전~오후',
         itemMemo: '카이유칸',
       },
+      {
+        id: 'd3-2',
+        placeId: 'place-tempozan-food',
+        sortOrder: 2,
+        timeNote: '점심',
+        itemMemo: '템포잔 식사 (추천)',
+      },
     ],
   },
   {
     date: '2026-12-06',
     dayIndex: 4,
-    dayLabel: 'USJ',
-    dayMemo: '유니버설 스튜디오 재팬 가는 날이에요.',
+    dayLabel: '성 · 시내',
+    dayMemo: '오사카성 공원 → 신사이바시 → 난바 저녁 (추천)',
     items: [
       {
         id: 'd4-1',
-        placeId: 'place-usj',
+        placeId: 'place-osaka-castle',
         sortOrder: 1,
-        timeNote: '종일',
-        itemMemo: 'USJ',
+        timeNote: '오전',
+        itemMemo: '공원 산책·사진',
+      },
+      {
+        id: 'd4-2',
+        placeId: 'place-lunch-castle',
+        sortOrder: 2,
+        timeNote: '점심',
+        itemMemo: '성 근처 (추천)',
+      },
+      {
+        id: 'd4-3',
+        placeId: 'place-shinsaibashi',
+        sortOrder: 3,
+        timeNote: '오후',
+        itemMemo: '걷기·기념품',
+      },
+      {
+        id: 'd4-4',
+        placeId: 'place-dinner-namba',
+        sortOrder: 4,
+        timeNote: '저녁',
+        itemMemo: '난바 저녁 (추천)',
       },
     ],
   },
@@ -321,14 +439,14 @@ export const days: DayPlan[] = [
     date: '2026-12-07',
     dayIndex: 5,
     dayLabel: '귀국',
-    dayMemo: '에어서울 RS 382 · KIX 18:00 → ICN 20:05',
+    dayMemo: '아침 시장 → 체크아웃 → KIX 저녁 비행기',
     items: [
       {
         id: 'd5-1',
         placeId: 'place-kuromon',
         sortOrder: 1,
         timeNote: '오전',
-        itemMemo: '여유 있으면',
+        itemMemo: '간단한 아침·간식',
       },
       {
         id: 'd5-2',
@@ -342,7 +460,7 @@ export const days: DayPlan[] = [
         placeId: 'place-kix',
         sortOrder: 3,
         timeNote: '18:00 출발',
-        itemMemo: 'KIX · RS 382',
+        itemMemo: 'KIX T1 참고 · RS 382',
       },
     ],
   },

@@ -10,7 +10,9 @@ export function TransitPage() {
       <div className="page transit-page">
         <header className="page-header">
           <h1>가는 방법</h1>
-          <p className="page-header__sub">가족 메모</p>
+          <p className="page-header__sub">
+            요금은 대략·참고예요. 달라질 수 있어요.
+          </p>
         </header>
         <ul className="transit-list">
           {transits.map((t) => (
@@ -20,6 +22,9 @@ export function TransitPage() {
                   {t.fromLabel} → {t.toLabel}
                 </strong>
                 <span>{t.modeNote}</span>
+                {t.fareApprox ? (
+                  <span className="transit-row__fare">{t.fareApprox}</span>
+                ) : null}
               </Link>
             </li>
           ))}
@@ -41,8 +46,13 @@ export function TransitPage() {
       </header>
 
       <section className="panel">
-        <h2>메모</h2>
+        <h2>어떻게 가요</h2>
         <p>{transit.stepsMemo}</p>
+        {transit.fareApprox ? (
+          <p className="fare-note">
+            <strong>대략 요금 (참고)</strong> {transit.fareApprox}
+          </p>
+        ) : null}
         {transit.cautionMemo ? (
           <p className="kids-note">
             <strong>주의</strong> {transit.cautionMemo}
