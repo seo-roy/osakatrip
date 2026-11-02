@@ -67,10 +67,20 @@ function migrateLegacyPacking(): PackingItem[] | null {
   }
 }
 
+/** Retired seed place ids — drop on merge so old aquarium day does not linger. */
+const RETIRED_PLACE_IDS = new Set([
+  'place-aquarium',
+  'place-tempozan-food',
+])
+
 /** Refresh known seed places (kid-friendly copy) while keeping user-added places. */
 function mergeSeedPlaces(places: Place[]): Place[] {
   const seed = seedPlacesNormalized()
-  const byId = new Map(places.map((p) => [p.placeId, p]))
+  const byId = new Map(
+    places
+      .filter((p) => !RETIRED_PLACE_IDS.has(p.placeId))
+      .map((p) => [p.placeId, p]),
+  )
   for (const sp of seed) {
     const existing = byId.get(sp.placeId)
     byId.set(sp.placeId, existing ? { ...existing, ...sp } : sp)
