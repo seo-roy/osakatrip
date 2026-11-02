@@ -69,25 +69,30 @@ export const tripMeta = {
   startDate: '2026-12-03',
   endDate: '2026-12-07',
   partySize: 4,
-  partyNote: '초5 여아, 초3 남아 포함',
-  homeMemo: '예시 메모 — 일정·숙소는 아직 확정 전으로 가정합니다.',
+  /** 표시용 가족 이름 — 초등 학년 문구 대신 사용 */
+  partyNote: '아빠 · 엄마 · Alice · Roy',
+  homeMemo:
+    '숙소·항공은 가족 예약 요약입니다. 관광 일차는 예시일 수 있어요. 항공 시각은 항공사·공항에서 재확인하세요.',
   usjVisitDate: '2026-12-06',
   usjDayIndex: 4,
   updatedAt: '2026-11-02T00:00:00+00:00',
+  contentRevision: 2,
   isSample: true as const,
 }
 
 export const places: Place[] = [
   {
     placeId: 'place-hotel',
-    name: '숙소 (예시)',
-    nameLocal: 'ホテル（例）',
+    name: '숙소 · 나니와구',
+    nameLocal: '大阪市浪速区',
     category: '숙소',
     familyBlurb:
-      '예시 숙소입니다. 실제 예약명·주소는 확정 후 교체하세요.',
-    address: '예시 주소 — 오사카시 ○○구',
-    mapUrl: 'https://maps.google.com/?q=Osaka',
-    kidsNote: '아이용 여분 충전기 챙기기 (예시 메모)',
+      '나니와구 집/아파트 전체 · 침대 2 · 게스트 4 · 호스트 Rui. 4박(2026-12-03→12-07). 확인코드는 앱에 표시하지 않습니다.',
+    address: '오사카시 나니와구 (Naniwa Ward, Osaka)',
+    mapUrl: 'https://maps.google.com/?q=Naniwa+Ward+Osaka',
+    verifyMemo:
+      '가족 메모: 24시간 동안 무료 취소 가능. 이후 취소 시 환불 불가. 시간은 리스팅 현지 시간 기준.',
+    kidsNote: '아이용 여분 충전기 챙기기',
     linkedTransitIds: ['transit-hotel-station'],
   },
   {
@@ -146,22 +151,46 @@ export const places: Place[] = [
     mapUrl: 'https://maps.google.com/?q=Kuromon+Market',
     linkedTransitIds: ['transit-hotel-kuromon'],
   },
+  {
+    placeId: 'place-kix',
+    name: '간사이 국제공항 (KIX)',
+    nameLocal: '関西国際空港',
+    category: '이동거점',
+    familyBlurb:
+      '출도착 공항. 탑승·수하물·교통은 공항·항공사 공식 안내로 확인하세요.',
+    address: 'Kansai International Airport (KIX)',
+    mapUrl: 'https://maps.google.com/?q=Kansai+International+Airport',
+    officialUrl: 'https://www.kansai-airport.or.jp/ko',
+    linkedTransitIds: ['transit-kix-hotel'],
+  },
 ]
 
 export const transits: Transit[] = [
   {
+    transitId: 'transit-kix-hotel',
+    fromLabel: 'KIX',
+    toLabel: '숙소 · 나니와구',
+    modeNote: '공항 교통+도보 (메모)',
+    stepsMemo:
+      '배차·요금은 앱에 고정하지 않습니다. 지도·공항 교통 안내로 재확인.',
+    checkUrl: 'https://maps.google.com/maps/dir/?api=1&origin=Kansai+International+Airport&destination=Naniwa+Ward+Osaka',
+    dateRefs: ['2026-12-03', '2026-12-07'],
+    placeRefs: ['place-kix', 'place-hotel'],
+    cautionMemo: '캐리어·아이와 이동 시 여유 있게',
+  },
+  {
     transitId: 'transit-hotel-station',
-    fromLabel: '숙소 (예시)',
+    fromLabel: '숙소 · 나니와구',
     toLabel: '가까운 역 (예시)',
     modeNote: '도보 (예시)',
     stepsMemo: '출구·짐 동선은 가족이 적어 두는 메모란입니다. 배차·요금 아님.',
     dateRefs: ['2026-12-03'],
     placeRefs: ['place-hotel'],
-    cautionMemo: '캐리어 있을 때 엘리베이터 우선 (예시)',
+    cautionMemo: '캐리어 있을 때 엘리베이터 우선',
   },
   {
     transitId: 'transit-hotel-dotonbori',
-    fromLabel: '숙소 (예시)',
+    fromLabel: '숙소 · 나니와구',
     toLabel: '도톤보리 (예시)',
     modeNote: '지하철+도보 (예시)',
     stepsMemo: '환승·출구 번호는 출발 전 지도 앱에서 재확인하세요.',
@@ -171,7 +200,7 @@ export const transits: Transit[] = [
   },
   {
     transitId: 'transit-hotel-castle',
-    fromLabel: '숙소 (예시)',
+    fromLabel: '숙소 · 나니와구',
     toLabel: '오사카성 공원 (예시)',
     modeNote: '지하철+도보 (예시)',
     stepsMemo: '소요는 추정 메모만 — 공식 배차가 아닙니다.',
@@ -181,7 +210,7 @@ export const transits: Transit[] = [
   },
   {
     transitId: 'transit-hotel-aquarium',
-    fromLabel: '숙소 (예시)',
+    fromLabel: '숙소 · 나니와구',
     toLabel: '카이유칸 (예시)',
     modeNote: '지하철+도보 (예시)',
     stepsMemo: '경로 재확인용 — 요금표 아님.',
@@ -191,18 +220,18 @@ export const transits: Transit[] = [
   },
   {
     transitId: 'transit-hotel-usj',
-    fromLabel: '숙소 (예시)',
+    fromLabel: '숙소 · 나니와구',
     toLabel: 'USJ (예시)',
     modeNote: '전철+도보 (예시)',
     stepsMemo: '당일 혼잡·운행은 공식·지도에서 확인. 앱에 시각표 없음.',
     checkUrl: 'https://maps.google.com/?q=Universal+Studios+Japan',
     dateRefs: ['2026-12-06'],
     placeRefs: ['place-usj'],
-    cautionMemo: '아이 손잡이·만날 장소 미리 (예시)',
+    cautionMemo: '아이 손잡이·만날 장소 미리',
   },
   {
     transitId: 'transit-hotel-kuromon',
-    fromLabel: '숙소 (예시)',
+    fromLabel: '숙소 · 나니와구',
     toLabel: '구로몬 시장 (예시)',
     modeNote: '지하철+도보 (예시)',
     stepsMemo: '아침 방문 후보용 예시 구간.',
@@ -216,22 +245,30 @@ export const days: DayPlan[] = [
   {
     date: '2026-12-03',
     dayIndex: 1,
-    dayLabel: '도착·저녁 산책 (예시)',
-    dayMemo: '예시 일차 — 실제 항공/숙소 도착 시각과 무관합니다.',
+    dayLabel: '도착 · 숙소',
+    dayMemo:
+      '가는 편 제주항공 7C 1305 ICN 16:55 → KIX 18:40 (직항, 가족 예약 메모 — 항공사에서 재확인).',
     items: [
+      {
+        id: 'd1-0',
+        placeId: 'place-kix',
+        sortOrder: 1,
+        timeNote: '18:40 도착 메모',
+        itemMemo: 'KIX 도착 후 숙소로 이동',
+      },
       {
         id: 'd1-1',
         placeId: 'place-hotel',
-        sortOrder: 1,
-        timeNote: '오후 (메모)',
-        itemMemo: '체크인·짐 풀기 (예시)',
+        sortOrder: 2,
+        timeNote: '저녁 체크인 메모',
+        itemMemo: '나니와구 숙소 · 짐 풀기',
       },
       {
         id: 'd1-2',
         placeId: 'place-dotonbori',
-        sortOrder: 2,
-        timeNote: '저녁 (메모)',
-        itemMemo: '가벼운 저녁·야경 (예시)',
+        sortOrder: 3,
+        timeNote: '저녁 (예시)',
+        itemMemo: '가벼운 저녁·야경 (예시 동선)',
       },
     ],
   },
@@ -288,21 +325,30 @@ export const days: DayPlan[] = [
   {
     date: '2026-12-07',
     dayIndex: 5,
-    dayLabel: '아침·귀국 준비 (예시)',
-    dayMemo: '예시 — 실제 출국/이동 시각과 다를 수 있음.',
+    dayLabel: '귀국',
+    dayMemo:
+      '오는 편 에어서울 RS 382 KIX 18:00 → ICN 20:05 (직항, 가족 예약 메모 — 항공사에서 재확인).',
     items: [
       {
         id: 'd5-1',
         placeId: 'place-kuromon',
         sortOrder: 1,
-        timeNote: '오전 (메모)',
+        timeNote: '오전 (예시)',
+        itemMemo: '여유 있으면 (예시)',
       },
       {
         id: 'd5-2',
         placeId: 'place-hotel',
         sortOrder: 2,
-        timeNote: '체크아웃 (메모)',
-        itemMemo: '짐·여권 최종 점검 (예시)',
+        timeNote: '체크아웃 메모',
+        itemMemo: '짐·여권 최종 점검',
+      },
+      {
+        id: 'd5-3',
+        placeId: 'place-kix',
+        sortOrder: 3,
+        timeNote: '18:00 출발 메모',
+        itemMemo: 'KIX에서 RS 382',
       },
     ],
   },

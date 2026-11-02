@@ -683,6 +683,37 @@ ul {
   }
 }
 
+.booking-lead {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.flight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.flight-card {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.flight-card__dir {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--sea);
+  margin-bottom: 4px;
+}
+
+.flight-card__meta {
+  margin-bottom: 4px;
+}
+
 .empty-state {
   padding: 16px 8px;
   text-align: center;

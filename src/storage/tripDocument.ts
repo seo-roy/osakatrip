@@ -13,9 +13,11 @@ import { createUsjSeed, type UsjState } from '../data/usjSeed'
 
 export const TRIP_STORAGE_KEY = 'osakatrip-trip-v1'
 export const LEGACY_PACKING_KEY = 'osakatrip-packing-v1'
+export const CONTENT_REVISION = tripMeta.contentRevision
 
 export interface TripDocument {
   version: 1
+  contentRevision: number
   updatedAt: string
   days: DayPlan[]
   places: Place[]
@@ -23,19 +25,21 @@ export interface TripDocument {
   usj: UsjState
 }
 
+function seedPlacesNormalized(): Place[] {
+  return structuredClone(seedPlaces).map((p) =>
+    p.placeId === 'place-usj'
+      ? { ...p, officialUrl: 'https://www.usj.co.jp/web/ko/usj' }
+      : p,
+  )
+}
+
 export function createSeedDocument(): TripDocument {
   return {
     version: 1,
+    contentRevision: CONTENT_REVISION,
     updatedAt: tripMeta.updatedAt,
     days: structuredClone(seedDays),
-    places: structuredClone(seedPlaces).map((p) =>
-      p.placeId === 'place-usj'
-        ? {
-            ...p,
-            officialUrl: 'https://www.usj.co.jp/web/ko/usj',
-          }
-        : p,
-    ),
+    places: seedPlacesNormalized(),
     packingItems: structuredClone(packingItemsSeed),
     usj: createUsjSeed(tripMeta.usjVisitDate),
   }
@@ -63,6 +67,45 @@ function migrateLegacyPacking(): PackingItem[] | null {
   }
 }
 
+/** Ensure lodging/airport seed places exist; refresh locked booking places from seed. */
+function mergeLockedPlaces(places: Place[]): Place[] {
+  const seed = seedPlacesNormalized()
+  const lockedIds = new Set(['place-hotel', 'place-kix'])
+  const byId = new Map(places.map((p) => [p.placeId, p]))
+  for (const sp of seed) {
+    if (lockedIds.has(sp.placeId)) {
+      byId.set(sp.placeId, sp)
+    } else if (!byId.has(sp.placeId)) {
+      byId.set(sp.placeId, sp)
+    }
+  }
+  return [...byId.values()]
+}
+
+function applyContentRevision(doc: TripDocument): TripDocument {
+  if (doc.contentRevision >= CONTENT_REVISION) {
+    return {
+      ...doc,
+      places: mergeLockedPlaces(doc.places),
+    }
+  }
+  const seed = createSeedDocument()
+  const arrival = seed.days.find((d) => d.date === '2026-12-03')
+  const departure = seed.days.find((d) => d.date === '2026-12-07')
+  return {
+    ...doc,
+    contentRevision: CONTENT_REVISION,
+    places: mergeLockedPlaces(doc.places),
+    days: doc.days.map((day) => {
+      if (day.date === '2026-12-03' && arrival) return structuredClone(arrival)
+      if (day.date === '2026-12-07' && departure)
+        return structuredClone(departure)
+      return day
+    }),
+    updatedAt: new Date().toISOString(),
+  }
+}
+
 export function loadTripDocument(): TripDocument {
   const seed = createSeedDocument()
   try {
@@ -78,17 +121,20 @@ export function loadTripDocument(): TripDocument {
     const parsed = JSON.parse(raw) as Partial<TripDocument>
     if (parsed.version !== 1) return seed
 
-    return {
+    const loaded: TripDocument = {
       version: 1,
+      contentRevision:
+        typeof parsed.contentRevision === 'number' ? parsed.contentRevision : 1,
       updatedAt:
         typeof parsed.updatedAt === 'string' ? parsed.updatedAt : seed.updatedAt,
       days:
         Array.isArray(parsed.days) && parsed.days.every(isDayPlan)
           ? parsed.days
           : seed.days,
-      places: Array.isArray(parsed.places) && parsed.places.length > 0
-        ? (parsed.places as Place[])
-        : seed.places,
+      places:
+        Array.isArray(parsed.places) && parsed.places.length > 0
+          ? (parsed.places as Place[])
+          : seed.places,
       packingItems:
         Array.isArray(parsed.packingItems) && parsed.packingItems.length > 0
           ? (parsed.packingItems as PackingItem[])
@@ -98,6 +144,7 @@ export function loadTripDocument(): TripDocument {
           ? { ...seed.usj, ...(parsed.usj as UsjState) }
           : seed.usj,
     }
+    return applyContentRevision(loaded)
   } catch {
     return seed
   }

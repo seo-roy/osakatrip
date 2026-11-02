@@ -10,6 +10,7 @@ import {
 import type { DayItem, DayPlan, PackingItem, Place } from '../data/sampleTrip'
 import type { UsjState } from '../data/usjSeed'
 import {
+  CONTENT_REVISION,
   createSeedDocument,
   loadTripDocument,
   newId,
@@ -49,6 +50,7 @@ interface TripContextValue {
   resetPackingSample: () => void
   toggleUsjCheck: (id: string) => void
   updateUsj: (patch: Partial<UsjState>) => void
+  replaceDocument: (next: TripDocument) => void
 }
 
 const TripContext = createContext<TripContextValue | null>(null)
@@ -272,6 +274,16 @@ export function TripProvider({ children }: { children: ReactNode }) {
     [commit],
   )
 
+  const replaceDocument = useCallback((next: TripDocument) => {
+    setDoc(
+      touch({
+        ...next,
+        version: 1,
+        contentRevision: next.contentRevision ?? CONTENT_REVISION,
+      }),
+    )
+  }, [])
+
   const value = useMemo<TripContextValue>(
     () => ({
       ready,
@@ -291,6 +303,7 @@ export function TripProvider({ children }: { children: ReactNode }) {
       resetPackingSample,
       toggleUsjCheck,
       updateUsj,
+      replaceDocument,
     }),
     [
       ready,
@@ -306,6 +319,7 @@ export function TripProvider({ children }: { children: ReactNode }) {
       resetPackingSample,
       toggleUsjCheck,
       updateUsj,
+      replaceDocument,
     ],
   )
 
