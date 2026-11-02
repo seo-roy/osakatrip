@@ -133,7 +133,7 @@ export const places: Place[] = [
     familyBlurb:
       'Day 4(2026-12-06) 방문 예정(확정 컨텍스트). 가격·개장·익스프레스는 앱에 고정하지 않음.',
     mapUrl: 'https://maps.google.com/?q=Universal+Studios+Japan',
-    officialUrl: 'https://www.usj.co.jp/',
+    officialUrl: 'https://www.usj.co.jp/web/ko/usj',
     kidsNote: '키 제한·만날 장소는 USJ 허브 메모에 (예시)',
     linkedTransitIds: ['transit-hotel-usj'],
   },

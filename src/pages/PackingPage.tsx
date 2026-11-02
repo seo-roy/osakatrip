@@ -1,50 +1,11 @@
-import { useEffect, useState } from 'react'
 import { SampleBanner } from '../components/SampleBanner'
-import {
-  packingCategories,
-  packingItemsSeed,
-  type PackingItem,
-} from '../data/sampleTrip'
-
-const STORAGE_KEY = 'osakatrip-packing-v1'
-
-function loadItems(): PackingItem[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return packingItemsSeed
-    const parsed = JSON.parse(raw) as PackingItem[]
-    if (!Array.isArray(parsed) || parsed.length === 0) return packingItemsSeed
-    return parsed
-  } catch {
-    return packingItemsSeed
-  }
-}
+import { packingCategories } from '../data/sampleTrip'
+import { useTrip } from '../storage/TripContext'
 
 export function PackingPage() {
-  const [items, setItems] = useState<PackingItem[]>(packingItemsSeed)
-
-  useEffect(() => {
-    setItems(loadItems())
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  }, [items])
-
-  const checked = items.filter((i) => i.done).length
-  const total = items.length
-
-  function toggle(id: string) {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, done: !item.done } : item,
-      ),
-    )
-  }
-
-  function resetSample() {
-    setItems(packingItemsSeed.map((i) => ({ ...i })))
-  }
+  const { packingItems, togglePacking, resetPackingSample } = useTrip()
+  const checked = packingItems.filter((i) => i.done).length
+  const total = packingItems.length
 
   return (
     <div className="page packing-page">
@@ -53,7 +14,7 @@ export function PackingPage() {
       <header className="page-header">
         <h1>준비물 체크리스트</h1>
         <p className="page-header__sub">
-          예시 목록 · 체크는 이 브라우저에만 저장 (동기화 later)
+          예시 목록 · 체크는 이 브라우저 trip 저장소에 보관 (동기화 later)
         </p>
         <p className="progress-line" aria-live="polite">
           진행 <strong>{checked}</strong> / {total}
@@ -61,7 +22,7 @@ export function PackingPage() {
       </header>
 
       {packingCategories.map((cat) => {
-        const catItems = items.filter((i) => i.categoryId === cat.id)
+        const catItems = packingItems.filter((i) => i.categoryId === cat.id)
         if (catItems.length === 0) return null
         return (
           <section
@@ -77,7 +38,7 @@ export function PackingPage() {
                     <input
                       type="checkbox"
                       checked={item.done}
-                      onChange={() => toggle(item.id)}
+                      onChange={() => togglePacking(item.id)}
                     />
                     <span>
                       <span className="check-row__label">{item.label}</span>
@@ -100,8 +61,8 @@ export function PackingPage() {
         )
       })}
 
-      <button type="button" className="ghost-btn" onClick={resetSample}>
-        예시 목록으로 초기화
+      <button type="button" className="ghost-btn" onClick={resetPackingSample}>
+        예시 준비물로 초기화
       </button>
     </div>
   )

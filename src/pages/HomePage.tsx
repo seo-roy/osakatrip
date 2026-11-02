@@ -1,16 +1,13 @@
 import { Link } from 'react-router-dom'
 import { SampleBanner } from '../components/SampleBanner'
-import {
-  days,
-  formatShortDate,
-  packingItemsSeed,
-  tripMeta,
-} from '../data/sampleTrip'
-
-const checked = packingItemsSeed.filter((i) => i.done).length
-const total = packingItemsSeed.length
+import { formatShortDate, tripMeta } from '../data/sampleTrip'
+import { useTrip } from '../storage/TripContext'
 
 export function HomePage() {
+  const { days, packingItems, resetToSample } = useTrip()
+  const checked = packingItems.filter((i) => i.done).length
+  const total = packingItems.length
+
   return (
     <div className="page home-page">
       <SampleBanner />
@@ -38,10 +35,7 @@ export function HomePage() {
         <ul className="day-list">
           {days.map((day) => (
             <li key={day.date}>
-              <Link
-                to={`/itinerary/${day.date}`}
-                className="day-row"
-              >
+              <Link to={`/itinerary/${day.date}`} className="day-row">
                 <span className="day-row__day">Day {day.dayIndex}</span>
                 <span className="day-row__meta">
                   <strong>
@@ -77,9 +71,13 @@ export function HomePage() {
       </section>
 
       <p className="fine-print">
-        접근: 공유 링크만 (near-private). 로그인·PIN은 이후 버전. 편집·동기화도
-        이후 — 지금은 로컬 예시 UI입니다.
+        접근: 공유 링크만 (near-private). 로그인·PIN은 later. 편집은 지금 이
+        브라우저 localStorage에 저장 · 기기 동기화는 later.
       </p>
+
+      <button type="button" className="ghost-btn" onClick={resetToSample}>
+        전체 예시 데이터로 초기화
+      </button>
     </div>
   )
 }
