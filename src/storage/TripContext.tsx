@@ -7,7 +7,13 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { DayItem, DayPlan, PackingItem, Place } from '../data/sampleTrip'
+import {
+  tripMeta,
+  type DayItem,
+  type DayPlan,
+  type PackingItem,
+  type Place,
+} from '../data/sampleTrip'
 import type { UsjState } from '../data/usjSeed'
 import {
   CONTENT_REVISION,
@@ -268,7 +274,11 @@ export function TripProvider({ children }: { children: ReactNode }) {
     (patch: Partial<UsjState>) => {
       commit((prev) => ({
         ...prev,
-        usj: { ...prev.usj, ...patch },
+        usj: {
+          ...prev.usj,
+          ...patch,
+          visitDate: tripMeta.usjVisitDate,
+        },
       }))
     },
     [commit],
@@ -280,6 +290,10 @@ export function TripProvider({ children }: { children: ReactNode }) {
         ...next,
         version: 1,
         contentRevision: next.contentRevision ?? CONTENT_REVISION,
+        usj: {
+          ...next.usj,
+          visitDate: tripMeta.usjVisitDate,
+        },
       }),
     )
   }, [])

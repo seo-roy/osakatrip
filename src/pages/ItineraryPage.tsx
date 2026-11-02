@@ -115,7 +115,7 @@ export function ItineraryPage() {
         </p>
       </header>
 
-      <div className="day-tabs" role="tablist" aria-label="여행 일차">
+      <div className="day-tabs" role="tablist" aria-label="여행 날짜">
         {days.map((d) => (
           <Link
             key={d.date}
@@ -124,15 +124,18 @@ export function ItineraryPage() {
             aria-selected={d.date === day.date}
             className={d.date === day.date ? 'day-tab is-active' : 'day-tab'}
           >
-            <span>D{d.dayIndex}</span>
             <span>{formatShortDate(d.date)}</span>
+            <span>
+              {d.date === tripMeta.usjVisitDate ? 'USJ' : d.dayLabel.split('·')[0].trim()}
+            </span>
           </Link>
         ))}
       </div>
 
       <section className="panel" aria-labelledby="day-title">
         <h2 id="day-title" className="day-title">
-          Day {day.dayIndex} · {formatKoreanDate(day.date)}
+          {formatKoreanDate(day.date)}
+          {day.date === tripMeta.usjVisitDate ? ' · USJ' : ''}
         </h2>
         <p className="day-label">{day.dayLabel}</p>
         {day.dayMemo ? <p className="day-memo">{day.dayMemo}</p> : null}
@@ -210,6 +213,9 @@ export function ItineraryPage() {
                   <div className="place-card__top">
                     <span className="place-card__order">{item.sortOrder}</span>
                     <div>
+                      {place.category === '식사' ? (
+                        <span className="place-card__tag">추천 맛집</span>
+                      ) : null}
                       <Link
                         to={`/places/${place.placeId}`}
                         className="place-card__name"

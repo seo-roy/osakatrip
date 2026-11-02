@@ -90,11 +90,17 @@ function mergePackingLabels(items: PackingItem[]): PackingItem[] {
   return [...refreshed, ...extras]
 }
 
+function pinUsjVisitDate(usj: UsjState): UsjState {
+  return { ...usj, visitDate: tripMeta.usjVisitDate }
+}
+
 function applyContentRevision(doc: TripDocument): TripDocument {
+  // Always pin calendar USJ date — stale localStorage must not keep 12-06 / Day4.
   if (doc.contentRevision >= CONTENT_REVISION) {
     return {
       ...doc,
       places: mergeSeedPlaces(doc.places),
+      usj: pinUsjVisitDate(doc.usj),
     }
   }
   const seed = createSeedDocument()
@@ -104,9 +110,8 @@ function applyContentRevision(doc: TripDocument): TripDocument {
     places: mergeSeedPlaces(doc.places),
     packingItems: mergePackingLabels(doc.packingItems),
     days: structuredClone(seed.days),
-    usj: {
+    usj: pinUsjVisitDate({
       ...seed.usj,
-      visitDate: tripMeta.usjVisitDate,
       checklist: seed.usj.checklist.map((s) => {
         const prev = doc.usj.checklist.find((c) => c.id === s.id)
         return prev ? { ...s, done: prev.done } : s
@@ -117,7 +122,7 @@ function applyContentRevision(doc: TripDocument): TripDocument {
       dayOfMemo: doc.usj.dayOfMemo,
       verifiedOn: doc.usj.verifiedOn,
       verifyMemo: doc.usj.verifyMemo,
-    },
+    }),
     updatedAt: new Date().toISOString(),
   }
 }

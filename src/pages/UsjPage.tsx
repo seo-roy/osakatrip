@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { formatUsjVisitLabel, tripMeta } from '../data/sampleTrip'
 import { usjMapQuery, usjOfficialLinksKr } from '../data/usjSeed'
 import {
   googleDirectionsUrl,
@@ -74,7 +75,8 @@ export function UsjPage() {
       <header className="page-header">
         <h1>USJ</h1>
         <p className="page-header__sub">
-          {usj.visitDate.replaceAll('-', '.')} · 가는 날
+          {formatUsjVisitLabel(usj.visitDate || tripMeta.usjVisitDate)} · 가는
+          날
         </p>
       </header>
 
@@ -214,10 +216,13 @@ export function UsjPage() {
       )}
 
       <div className="home-actions">
-        <Link to={`/itinerary/${usj.visitDate}`} className="action-tile">
+        <Link
+          to={`/itinerary/${usj.visitDate || tripMeta.usjVisitDate}`}
+          className="action-tile"
+        >
           <span className="action-tile__label">그날 일정</span>
           <span className="action-tile__sub">
-            {usj.visitDate.replaceAll('-', '.')}
+            {formatUsjVisitLabel(usj.visitDate || tripMeta.usjVisitDate)}
           </span>
         </Link>
         <Link to="/places/place-usj" className="action-tile">

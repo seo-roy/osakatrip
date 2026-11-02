@@ -73,10 +73,10 @@ export const tripMeta = {
   partySize: 4,
   partyNote: '아빠 · 엄마 · Alice · Roy',
   homeMemo: '',
-  /** 달력 날짜 — “여행 n일차”가 아님 */
+  /** 달력 날짜 — “여행 n일차/Day 4”가 아님. 반드시 2026-12-04 */
   usjVisitDate: '2026-12-04',
-  updatedAt: '2026-11-02T00:00:00+00:00',
-  contentRevision: 4,
+  updatedAt: '2026-11-02T06:00:00+00:00',
+  contentRevision: 5,
   isSample: true as const,
 }
 
@@ -119,14 +119,14 @@ export const places: Place[] = [
   },
   {
     placeId: 'place-dinner-doton',
-    name: '도톤보리 저녁 (추천)',
-    nameLocal: '道頓堀',
+    name: '쿠시카츠 다루마 도톤보리 (추천)',
+    nameLocal: '串カツだるま 道頓堀店',
     category: '식사',
     familyBlurb:
-      '추천: 타코야키·쿠시카츠 등 아이 친화 포차/가게. 줄이 길면 옆 골목도 봐요.',
-    address: '도톤보리 일대',
-    mapUrl: 'https://maps.google.com/?q=Dotonbori+food',
-    kidsNote: '맵지 않은 메뉴를 골라요.',
+      '추천 맛집: 꼬치튀김 다루마. Alice·Roy와 나눠 먹기 좋아요. 줄이 길면 옆 골목 타코야키도 봐요.',
+    address: '오사카시 주오구 도톤보리',
+    mapUrl: 'https://maps.google.com/?q=Kushikatsu+Daruma+Dotonbori',
+    kidsNote: '맵지 않은 소스를 골라요.',
     linkedTransitIds: ['transit-hotel-dotonbori'],
   },
   {
@@ -135,7 +135,7 @@ export const places: Place[] = [
     nameLocal: 'ユニバーサル・スタジオ・ジャパン',
     category: '관광',
     familyBlurb:
-      '12월 4일(금)에 가요. 티켓·안내는 USJ 메뉴와 한국어 공식 사이트를 봐요.',
+      '가는 날: 2026년 12월 4일(금). 티켓·안내는 USJ 메뉴와 한국어 공식 사이트를 봐요.',
     mapUrl: 'https://maps.google.com/?q=Universal+Studios+Japan',
     officialUrl: 'https://www.usj.co.jp/web/ko/usj',
     kidsNote: '만날 곳을 미리 정해요.',
@@ -143,12 +143,14 @@ export const places: Place[] = [
   },
   {
     placeId: 'place-usj-lunch',
-    name: 'USJ·시티워크 식사 (추천)',
+    name: '모모타로 · 시티워크 (추천)',
+    nameLocal: '桃太郎 ユニバーサル・シティウォーク店',
     category: '식사',
     familyBlurb:
-      '추천: 파크 안 또는 유니버설·시티워크 식당. 공식 앱·현장에서 메뉴를 확인해요.',
-    mapUrl: 'https://maps.google.com/?q=Universal+CityWalk+Osaka',
-    kidsNote: '줄이 길면 간식으로 나눠 먹어요.',
+      '추천 맛집: 유니버설·시티워크 「모모타로」(오코노미야키). 파크 안 식당·간식도 좋아요. 메뉴·대기는 현장에서 확인해요.',
+    address: '유니버설·시티워크 오사카',
+    mapUrl: 'https://maps.google.com/?q=Momotaro+Universal+CityWalk+Osaka',
+    kidsNote: '줄이 길면 시티워크 다른 가게나 간식으로 나눠 먹어요.',
     linkedTransitIds: ['transit-hotel-usj'],
   },
   {
@@ -164,11 +166,13 @@ export const places: Place[] = [
   },
   {
     placeId: 'place-tempozan-food',
-    name: '템포잔 마켓플레이스 식사 (추천)',
+    name: '카피치오사 템포잔 (추천)',
+    nameLocal: 'カプリチョーザ 天保山店',
     category: '식사',
     familyBlurb:
-      '추천: 카이유칸 옆 템포잔에서 가볍게 점심/간식. 아이 메뉴가 많은 편이에요.',
-    mapUrl: 'https://maps.google.com/?q=Tempozan+Marketplace+Osaka',
+      '추천 맛집: 카이유칸 옆 템포잔 마켓의 이탈리안 「카피치오사」. 피자·파스타로 아이와 나누기 좋아요.',
+    address: '템포잔 마켓플레이스',
+    mapUrl: 'https://maps.google.com/?q=Capricciosa+Tempozan+Osaka',
     linkedTransitIds: ['transit-hotel-aquarium'],
   },
   {
@@ -183,11 +187,13 @@ export const places: Place[] = [
   },
   {
     placeId: 'place-lunch-castle',
-    name: '성 근처 점심 (추천)',
+    name: '오사카성 공원 카페테라스 (추천)',
+    nameLocal: '大阪城公園カフェテラス',
     category: '식사',
     familyBlurb:
-      '추천: 공원 근처 식당 또는 오사카성 공원 카페. 붐비면 조기 점심을 권해요.',
-    mapUrl: 'https://maps.google.com/?q=Osaka+Castle+restaurant',
+      '추천 맛집: 공원 안 「카페테라스」에서 가볍게 점심. 붐비면 일찍 먹거나 근처 식당으로 옮겨요.',
+    address: '오사카성 공원 일대',
+    mapUrl: 'https://maps.google.com/?q=Osaka+Castle+Park+Cafe+Terrace',
     linkedTransitIds: ['transit-hotel-castle'],
   },
   {
@@ -202,22 +208,26 @@ export const places: Place[] = [
   },
   {
     placeId: 'place-dinner-namba',
-    name: '난바 저녁 (추천)',
+    name: '미즈노 오코노미야키 (추천)',
+    nameLocal: '美津の',
     category: '식사',
     familyBlurb:
-      '추천: 난바·도톤보리 쪽 라멘·오코노미야키 등. Alice·Roy가 먹을 수 있는 순한 맛을 고르세요.',
-    mapUrl: 'https://maps.google.com/?q=Namba+Osaka+dinner',
+      '추천 맛집: 도톤보리 「미즈노」오코노미야키. Alice·Roy가 먹기 좋은 순한 맛. 줄이 길면 근처 분식도 OK.',
+    address: '오사카시 주오구 도톤보리',
+    mapUrl: 'https://maps.google.com/?q=Mizuno+Okonomiyaki+Dotonbori',
     linkedTransitIds: ['transit-hotel-dotonbori'],
   },
   {
     placeId: 'place-kuromon',
-    name: '구로몬 시장',
+    name: '구로몬 시장 · 아침 간식 (추천)',
     nameLocal: '黒門市場',
     category: '식사',
-    familyBlurb: '아침·간식 먹기 좋은 시장이에요. 귀국 날 짧게 들르기 좋아요.',
+    familyBlurb:
+      '추천: 구로몬에서 꼬치·초밥·과일 주스 등 가볍게. 가게마다 메뉴가 달라요. 귀국 전 짧게.',
     mapUrl: 'https://maps.google.com/?q=Kuromon+Market',
     linkedTransitIds: ['transit-hotel-kuromon'],
   },
+
 ]
 
 /** 요금은 대략·참고. 당일 IC·창구 요금이 다를 수 있음. */
@@ -323,7 +333,7 @@ export const days: DayPlan[] = [
     date: '2026-12-03',
     dayIndex: 1,
     dayLabel: '도착 · 저녁',
-    dayMemo: '비행기 도착 후 숙소 → 도톤보리 저녁 (추천)',
+    dayMemo: '비행기 도착 후 숙소 → 도톤보리 · 쿠시카츠 다루마 (추천)',
     items: [
       {
         id: 'd1-0',
@@ -351,29 +361,29 @@ export const days: DayPlan[] = [
         placeId: 'place-dinner-doton',
         sortOrder: 4,
         timeNote: '저녁 식사',
-        itemMemo: '타코야키·쿠시카츠 등 (추천)',
+        itemMemo: '추천 맛집 · 다루마',
       },
     ],
   },
   {
     date: '2026-12-04',
     dayIndex: 2,
-    dayLabel: 'USJ',
-    dayMemo: '12월 4일 · 유니버설 스튜디오 재팬 (추천 집중일)',
+    dayLabel: 'USJ · 12월 4일',
+    dayMemo: '2026년 12월 4일(금) · 유니버설 스튜디오 재팬 + 시티워크 식사 (추천)',
     items: [
       {
         id: 'd2-1',
         placeId: 'place-usj',
         sortOrder: 1,
         timeNote: '종일',
-        itemMemo: '공식 안내·티켓 확인',
+        itemMemo: '12월 4일 · 공식 안내·티켓 확인',
       },
       {
         id: 'd2-2',
         placeId: 'place-usj-lunch',
         sortOrder: 2,
         timeNote: '점심·간식',
-        itemMemo: '파크·시티워크 (추천)',
+        itemMemo: '추천 맛집 · 모모타로 시티워크',
       },
     ],
   },
@@ -381,7 +391,7 @@ export const days: DayPlan[] = [
     date: '2026-12-05',
     dayIndex: 3,
     dayLabel: '수족관',
-    dayMemo: '카이유칸 · 템포잔에서 쉬며 놀아요 (추천)',
+    dayMemo: '카이유칸 · 템포잔 카피치오사 점심 (추천)',
     items: [
       {
         id: 'd3-1',
@@ -395,7 +405,7 @@ export const days: DayPlan[] = [
         placeId: 'place-tempozan-food',
         sortOrder: 2,
         timeNote: '점심',
-        itemMemo: '템포잔 식사 (추천)',
+        itemMemo: '추천 맛집 · 카피치오사',
       },
     ],
   },
@@ -403,7 +413,7 @@ export const days: DayPlan[] = [
     date: '2026-12-06',
     dayIndex: 4,
     dayLabel: '성 · 시내',
-    dayMemo: '오사카성 공원 → 신사이바시 → 난바 저녁 (추천)',
+    dayMemo: '오사카성 공원 → 신사이바시 → 미즈노 저녁 (추천)',
     items: [
       {
         id: 'd4-1',
@@ -417,7 +427,7 @@ export const days: DayPlan[] = [
         placeId: 'place-lunch-castle',
         sortOrder: 2,
         timeNote: '점심',
-        itemMemo: '성 근처 (추천)',
+        itemMemo: '추천 맛집 · 카페테라스',
       },
       {
         id: 'd4-3',
@@ -431,7 +441,7 @@ export const days: DayPlan[] = [
         placeId: 'place-dinner-namba',
         sortOrder: 4,
         timeNote: '저녁',
-        itemMemo: '난바 저녁 (추천)',
+        itemMemo: '추천 맛집 · 미즈노',
       },
     ],
   },
@@ -439,14 +449,14 @@ export const days: DayPlan[] = [
     date: '2026-12-07',
     dayIndex: 5,
     dayLabel: '귀국',
-    dayMemo: '아침 시장 → 체크아웃 → KIX 저녁 비행기',
+    dayMemo: '구로몬 아침 간식 → 체크아웃 → KIX 저녁 비행기',
     items: [
       {
         id: 'd5-1',
         placeId: 'place-kuromon',
         sortOrder: 1,
         timeNote: '오전',
-        itemMemo: '간단한 아침·간식',
+        itemMemo: '추천 · 꼬치·초밥 가볍게',
       },
       {
         id: 'd5-2',
@@ -464,6 +474,7 @@ export const days: DayPlan[] = [
       },
     ],
   },
+
 ]
 
 export const packingCategories: PackingCategory[] = [
@@ -554,4 +565,17 @@ export function formatKoreanDate(iso: string): string {
 export function formatShortDate(iso: string): string {
   const [, m, d] = iso.split('-').map(Number)
   return `${m}/${d}`
+}
+
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'] as const
+
+export function formatWeekdayKo(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const day = new Date(Date.UTC(y, m - 1, d)).getUTCDay()
+  return WEEKDAY_KO[day]
+}
+
+/** USJ 가는 날 — 달력 표기 (여행 n일차 아님) */
+export function formatUsjVisitLabel(iso: string = tripMeta.usjVisitDate): string {
+  return `${formatKoreanDate(iso)} (${formatWeekdayKo(iso)})`
 }

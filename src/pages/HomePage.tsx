@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom'
-import { formatShortDate, tripMeta } from '../data/sampleTrip'
+import {
+  formatShortDate,
+  formatUsjVisitLabel,
+  tripMeta,
+} from '../data/sampleTrip'
 import {
   flights,
   formatTerminalLine,
@@ -9,9 +13,19 @@ import {
 import { useTrip } from '../storage/TripContext'
 
 export function HomePage() {
-  const { days, packingItems } = useTrip()
+  const { days, packingItems, getPlace } = useTrip()
   const checked = packingItems.filter((i) => i.done).length
   const total = packingItems.length
+
+  function mealTip(date: string): string | null {
+    const day = days.find((d) => d.date === date)
+    if (!day) return null
+    for (const item of day.items) {
+      const place = getPlace(item.placeId)
+      if (place?.category === '식사') return place.name
+    }
+    return null
+  }
 
   return (
     <div className="page home-page">
@@ -83,25 +97,32 @@ export function HomePage() {
           </Link>
         </div>
         <ul className="day-list">
-          {days.map((day) => (
-            <li key={day.date}>
-              <Link to={`/itinerary/${day.date}`} className="day-row">
-                <span className="day-row__day">
-                  {formatShortDate(day.date)}
-                </span>
-                <span className="day-row__meta">
-                  <strong>{day.dayLabel}</strong>
-                  <span>
-                    {day.items.length}곳
-                    {day.date === tripMeta.usjVisitDate ? ' · USJ' : ''}
+          {days.map((day) => {
+            const meal = mealTip(day.date)
+            const isUsj = day.date === tripMeta.usjVisitDate
+            return (
+              <li key={day.date}>
+                <Link to={`/itinerary/${day.date}`} className="day-row">
+                  <span className="day-row__day">
+                    {formatShortDate(day.date)}
                   </span>
-                </span>
-                <span className="day-row__chev" aria-hidden="true">
-                  ›
-                </span>
-              </Link>
-            </li>
-          ))}
+                  <span className="day-row__meta">
+                    <strong>
+                      {isUsj ? 'USJ · 12월 4일' : day.dayLabel}
+                    </strong>
+                    <span>
+                      {meal
+                        ? meal.replace(/\s*\(추천\)\s*$/, '')
+                        : `${day.items.length}곳`}
+                    </span>
+                  </span>
+                  <span className="day-row__chev" aria-hidden="true">
+                    ›
+                  </span>
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </section>
 
@@ -109,7 +130,7 @@ export function HomePage() {
         <Link to="/usj" className="action-tile action-tile--usj">
           <span className="action-tile__label">USJ</span>
           <span className="action-tile__sub">
-            {tripMeta.usjVisitDate.replaceAll('-', '.')}
+            {formatUsjVisitLabel(tripMeta.usjVisitDate)}
           </span>
         </Link>
         <Link to="/transit" className="action-tile">
