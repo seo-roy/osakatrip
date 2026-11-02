@@ -683,6 +683,23 @@ ul {
   }
 }
 
+.settings-foot {
+  text-align: center;
+  padding: 8px 4px 4px;
+}
+
+.settings-foot__link {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+.settings-foot__link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
 .booking-lead {
   font-family: var(--font-display);
   font-weight: 700;

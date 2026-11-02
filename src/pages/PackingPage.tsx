@@ -1,23 +1,20 @@
-import { SampleBanner } from '../components/SampleBanner'
 import { packingCategories } from '../data/sampleTrip'
+import { useAdultMode } from '../storage/AdultModeContext'
 import { useTrip } from '../storage/TripContext'
 
 export function PackingPage() {
+  const { adultMode } = useAdultMode()
   const { packingItems, togglePacking, resetPackingSample } = useTrip()
   const checked = packingItems.filter((i) => i.done).length
   const total = packingItems.length
 
   return (
     <div className="page packing-page">
-      <SampleBanner />
-
       <header className="page-header">
-        <h1>준비물 체크리스트</h1>
-        <p className="page-header__sub">
-          예시 목록 · 체크는 이 브라우저 trip 저장소에 보관 (동기화 later)
-        </p>
+        <h1>준비물</h1>
+        <p className="page-header__sub">챙기면 체크해요</p>
         <p className="progress-line" aria-live="polite">
-          진행 <strong>{checked}</strong> / {total}
+          <strong>{checked}</strong> / {total}
         </p>
       </header>
 
@@ -46,7 +43,7 @@ export function PackingPage() {
                         <span className="check-row__meta">
                           {[
                             item.assigneeNote,
-                            item.kidsRelevant ? '아이 관련' : null,
+                            item.kidsRelevant ? '아이' : null,
                           ]
                             .filter(Boolean)
                             .join(' · ')}
@@ -61,9 +58,11 @@ export function PackingPage() {
         )
       })}
 
-      <button type="button" className="ghost-btn" onClick={resetPackingSample}>
-        예시 준비물로 초기화
-      </button>
+      {adultMode ? (
+        <button type="button" className="ghost-btn" onClick={resetPackingSample}>
+          준비물 목록 되돌리기
+        </button>
+      ) : null}
     </div>
   )
 }

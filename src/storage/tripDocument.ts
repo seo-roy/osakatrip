@@ -67,41 +67,56 @@ function migrateLegacyPacking(): PackingItem[] | null {
   }
 }
 
-/** Ensure lodging/airport seed places exist; refresh locked booking places from seed. */
-function mergeLockedPlaces(places: Place[]): Place[] {
+/** Refresh known seed places (kid-friendly copy) while keeping user-added places. */
+function mergeSeedPlaces(places: Place[]): Place[] {
   const seed = seedPlacesNormalized()
-  const lockedIds = new Set(['place-hotel', 'place-kix'])
   const byId = new Map(places.map((p) => [p.placeId, p]))
   for (const sp of seed) {
-    if (lockedIds.has(sp.placeId)) {
-      byId.set(sp.placeId, sp)
-    } else if (!byId.has(sp.placeId)) {
-      byId.set(sp.placeId, sp)
-    }
+    const existing = byId.get(sp.placeId)
+    byId.set(sp.placeId, existing ? { ...existing, ...sp } : sp)
   }
   return [...byId.values()]
+}
+
+function mergePackingLabels(items: PackingItem[]): PackingItem[] {
+  const seed = structuredClone(packingItemsSeed)
+  const doneById = new Map(items.map((i) => [i.id, i.done]))
+  const known = new Set(seed.map((i) => i.id))
+  const refreshed = seed.map((s) => ({
+    ...s,
+    done: doneById.has(s.id) ? Boolean(doneById.get(s.id)) : s.done,
+  }))
+  const extras = items.filter((i) => !known.has(i.id))
+  return [...refreshed, ...extras]
 }
 
 function applyContentRevision(doc: TripDocument): TripDocument {
   if (doc.contentRevision >= CONTENT_REVISION) {
     return {
       ...doc,
-      places: mergeLockedPlaces(doc.places),
+      places: mergeSeedPlaces(doc.places),
     }
   }
   const seed = createSeedDocument()
-  const arrival = seed.days.find((d) => d.date === '2026-12-03')
-  const departure = seed.days.find((d) => d.date === '2026-12-07')
   return {
     ...doc,
     contentRevision: CONTENT_REVISION,
-    places: mergeLockedPlaces(doc.places),
-    days: doc.days.map((day) => {
-      if (day.date === '2026-12-03' && arrival) return structuredClone(arrival)
-      if (day.date === '2026-12-07' && departure)
-        return structuredClone(departure)
-      return day
-    }),
+    places: mergeSeedPlaces(doc.places),
+    packingItems: mergePackingLabels(doc.packingItems),
+    days: structuredClone(seed.days),
+    usj: {
+      ...seed.usj,
+      checklist: seed.usj.checklist.map((s) => {
+        const prev = doc.usj.checklist.find((c) => c.id === s.id)
+        return prev ? { ...s, done: prev.done } : s
+      }),
+      meetingPointMemo: doc.usj.meetingPointMemo || seed.usj.meetingPointMemo,
+      kidsPlanMemo: doc.usj.kidsPlanMemo || seed.usj.kidsPlanMemo,
+      ticketMemo: doc.usj.ticketMemo || seed.usj.ticketMemo,
+      dayOfMemo: doc.usj.dayOfMemo,
+      verifiedOn: doc.usj.verifiedOn,
+      verifyMemo: doc.usj.verifyMemo,
+    },
     updatedAt: new Date().toISOString(),
   }
 }

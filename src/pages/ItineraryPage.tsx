@@ -1,12 +1,12 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { SampleBanner } from '../components/SampleBanner'
 import {
   formatKoreanDate,
   formatShortDate,
   tripMeta,
   type DayItem,
 } from '../data/sampleTrip'
+import { useAdultMode } from '../storage/AdultModeContext'
 import { useTrip } from '../storage/TripContext'
 
 type Draft = {
@@ -30,6 +30,7 @@ const emptyDraft = (): Draft => ({
 
 export function ItineraryPage() {
   const { date } = useParams()
+  const { adultMode } = useAdultMode()
   const {
     days,
     places,
@@ -49,17 +50,14 @@ export function ItineraryPage() {
 
   const items = useMemo(
     () =>
-      day
-        ? day.items.slice().sort((a, b) => a.sortOrder - b.sortOrder)
-        : [],
+      day ? day.items.slice().sort((a, b) => a.sortOrder - b.sortOrder) : [],
     [day],
   )
 
   if (!day) {
     return (
       <div className="page">
-        <SampleBanner />
-        <p className="empty-state">일정이 없습니다.</p>
+        <p className="empty-state">아직 일정이 없어요.</p>
       </div>
     )
   }
@@ -109,13 +107,11 @@ export function ItineraryPage() {
 
   return (
     <div className="page itinerary-page">
-      <SampleBanner />
-
       <header className="page-header">
         <h1>날짜별 일정</h1>
         <p className="page-header__sub">
           {tripMeta.startDate.replaceAll('-', '.')} –{' '}
-          {tripMeta.endDate.replaceAll('-', '.')} · 편집은 이 기기에 저장
+          {tripMeta.endDate.replaceAll('-', '.')}
         </p>
       </header>
 
@@ -139,43 +135,41 @@ export function ItineraryPage() {
           Day {day.dayIndex} · {formatKoreanDate(day.date)}
         </h2>
         <p className="day-label">{day.dayLabel}</p>
+        {day.dayMemo ? <p className="day-memo">{day.dayMemo}</p> : null}
 
-        {editingDayMemo ? (
-          <div className="field-stack">
-            <label className="field">
-              <span>하루 메모</span>
-              <textarea
-                rows={2}
-                value={dayMemoDraft}
-                maxLength={200}
-                onChange={(e) => setDayMemoDraft(e.target.value)}
-              />
-            </label>
-            <div className="btn-row">
-              <button
-                type="button"
-                className="primary-btn"
-                onClick={() => {
-                  updateDayMemo(day.date, dayMemoDraft)
-                  setDayMemoDraft(null)
-                }}
-              >
-                저장
-              </button>
-              <button
-                type="button"
-                className="ghost-btn ghost-btn--inline"
-                onClick={() => setDayMemoDraft(null)}
-              >
-                취소
-              </button>
+        {adultMode ? (
+          editingDayMemo ? (
+            <div className="field-stack">
+              <label className="field">
+                <span>하루 메모</span>
+                <textarea
+                  rows={2}
+                  value={dayMemoDraft}
+                  maxLength={200}
+                  onChange={(e) => setDayMemoDraft(e.target.value)}
+                />
+              </label>
+              <div className="btn-row">
+                <button
+                  type="button"
+                  className="primary-btn"
+                  onClick={() => {
+                    updateDayMemo(day.date, dayMemoDraft)
+                    setDayMemoDraft(null)
+                  }}
+                >
+                  저장
+                </button>
+                <button
+                  type="button"
+                  className="ghost-btn ghost-btn--inline"
+                  onClick={() => setDayMemoDraft(null)}
+                >
+                  취소
+                </button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <>
-            {day.dayMemo ? <p className="day-memo">{day.dayMemo}</p> : (
-              <p className="muted">하루 메모 없음</p>
-            )}
+          ) : (
             <button
               type="button"
               className="text-btn"
@@ -183,13 +177,12 @@ export function ItineraryPage() {
             >
               하루 메모 편집
             </button>
-          </>
-        )}
+          )
+        ) : null}
 
         {items.length === 0 ? (
           <div className="empty-state">
-            <p>이 날 등록된 장소가 없습니다.</p>
-            <p className="muted">아래「장소 추가」로 예시·가족 일정을 채워 보세요.</p>
+            <p>이 날 일정이 아직 없어요.</p>
           </div>
         ) : (
           <ul className="place-list">
@@ -199,14 +192,16 @@ export function ItineraryPage() {
               if (!place) {
                 return (
                   <li key={item.id} className="place-card">
-                    <p className="form-error">알 수 없는 장소</p>
-                    <button
-                      type="button"
-                      className="text-btn danger"
-                      onClick={() => removeDayItem(day.date, item.id)}
-                    >
-                      삭제
-                    </button>
+                    <p>장소를 찾을 수 없어요</p>
+                    {adultMode ? (
+                      <button
+                        type="button"
+                        className="text-btn danger"
+                        onClick={() => removeDayItem(day.date, item.id)}
+                      >
+                        삭제
+                      </button>
+                    ) : null}
                   </li>
                 )
               }
@@ -223,41 +218,43 @@ export function ItineraryPage() {
                       </Link>
                       {item.timeNote ? (
                         <p className="place-card__time">{item.timeNote}</p>
-                      ) : (
-                        <p className="place-card__time muted">시간 메모 없음</p>
-                      )}
+                      ) : null}
                       {item.itemMemo ? (
                         <p className="place-card__memo">{item.itemMemo}</p>
                       ) : null}
                     </div>
                   </div>
                   <div className="place-card__links">
-                    <Link to={`/places/${place.placeId}`}>장소·지도</Link>
+                    <Link to={`/places/${place.placeId}`}>자세히 · 지도</Link>
                     {prev ? (
                       <Link
                         to={`/places/${place.placeId}?from=${prev.placeId}`}
                       >
-                        이전→여기 길찾기
+                        길찾기
                       </Link>
                     ) : null}
-                    <button
-                      type="button"
-                      className="text-btn"
-                      onClick={() => openEdit(item)}
-                    >
-                      편집
-                    </button>
-                    <button
-                      type="button"
-                      className="text-btn danger"
-                      onClick={() => {
-                        if (confirm(`「${place.name}」을(를) 이 날에서 삭제할까요?`)) {
-                          removeDayItem(day.date, item.id)
-                        }
-                      }}
-                    >
-                      삭제
-                    </button>
+                    {adultMode ? (
+                      <>
+                        <button
+                          type="button"
+                          className="text-btn"
+                          onClick={() => openEdit(item)}
+                        >
+                          편집
+                        </button>
+                        <button
+                          type="button"
+                          className="text-btn danger"
+                          onClick={() => {
+                            if (confirm(`「${place.name}」을(를) 뺄까요?`)) {
+                              removeDayItem(day.date, item.id)
+                            }
+                          }}
+                        >
+                          삭제
+                        </button>
+                      </>
+                    ) : null}
                   </div>
                 </li>
               )
@@ -265,24 +262,23 @@ export function ItineraryPage() {
           </ul>
         )}
 
-        <button type="button" className="secondary-cta" onClick={openAdd}>
-          장소 추가
-        </button>
+        {adultMode ? (
+          <button type="button" className="secondary-cta" onClick={openAdd}>
+            장소 추가
+          </button>
+        ) : null}
       </section>
 
-      {draft ? (
+      {adultMode && draft ? (
         <div className="sheet" role="dialog" aria-labelledby="item-editor-title">
           <form className="sheet__panel" onSubmit={onSubmit}>
             <h2 id="item-editor-title">
-              {draft.itemId ? '일정 항목 편집' : '장소 추가'}
+              {draft.itemId ? '일정 고치기' : '장소 추가'}
             </h2>
-            <p className="fine-print">
-              시간 메모는 가족 약속용 텍스트입니다. 공식 영업시간이 아닙니다.
-            </p>
 
             {!draft.itemId || draft.mode === 'new' ? (
               <fieldset className="field">
-                <legend>장소 선택</legend>
+                <legend>장소</legend>
                 <div className="segmented">
                   <label>
                     <input
@@ -302,7 +298,7 @@ export function ItineraryPage() {
                         )
                       }
                     />
-                    기존 장소
+                    목록에서
                   </label>
                   <label>
                     <input
@@ -313,7 +309,7 @@ export function ItineraryPage() {
                         setDraft((d) => (d ? { ...d, mode: 'new' } : d))
                       }
                     />
-                    새 장소
+                    새로
                   </label>
                 </div>
               </fieldset>
@@ -342,7 +338,7 @@ export function ItineraryPage() {
             ) : (
               <>
                 <label className="field">
-                  <span>새 장소 이름 *</span>
+                  <span>새 장소 이름</span>
                   <input
                     value={draft.newPlaceName}
                     maxLength={60}
@@ -351,12 +347,11 @@ export function ItineraryPage() {
                         d ? { ...d, newPlaceName: e.target.value } : d,
                       )
                     }
-                    placeholder="예: ○○ 라멘"
                     required
                   />
                 </label>
                 <label className="field">
-                  <span>주소 (선택 · 지도용)</span>
+                  <span>주소 (선택)</span>
                   <input
                     value={draft.newPlaceAddress}
                     maxLength={120}
@@ -365,26 +360,24 @@ export function ItineraryPage() {
                         d ? { ...d, newPlaceAddress: e.target.value } : d,
                       )
                     }
-                    placeholder="모르면 비워 두고 나중에 보완"
                   />
                 </label>
               </>
             )}
 
             <label className="field">
-              <span>시간 메모 (예: 오전, 14시쯤)</span>
+              <span>시간 (예: 오전, 2시쯤)</span>
               <input
                 value={draft.timeNote}
                 maxLength={40}
                 onChange={(e) =>
                   setDraft((d) => (d ? { ...d, timeNote: e.target.value } : d))
                 }
-                placeholder="확정 시각 아님"
               />
             </label>
 
             <label className="field">
-              <span>가족 메모</span>
+              <span>메모</span>
               <textarea
                 rows={3}
                 value={draft.itemMemo}
